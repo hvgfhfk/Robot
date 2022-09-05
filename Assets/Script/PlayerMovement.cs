@@ -6,18 +6,19 @@ public class PlayerMovement : MonoBehaviour
 {
     public bool isGround = true;
     public bool isRun = false;
+    public bool isBorder;
 
     [SerializeField]
-    private float walkSpeed = 15f;
+    public float walkSpeed = 15f;
     [SerializeField]
-    private float runSpeed = 30f;
+    public float runSpeed = 30f;
 
     public float jumpForce = 5.0f;
 
     [SerializeField]
     private float applySpeed;
 
-    // ÄÄÆ÷³ÍÆ®
+    // ????????
     private Animator animator;
     private Rigidbody rigidbody;
     private CapsuleCollider capsuleCollider;
@@ -38,6 +39,7 @@ public class PlayerMovement : MonoBehaviour
         CheckGround();
         TryRun();
         Movement();
+        StopToWall();
     }
 
     private void Movement()
@@ -50,12 +52,16 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * applySpeed;
 
-        rigidbody.MovePosition(transform.position + _velocity * Time.deltaTime);
+        if(!isBorder)
+        {
+            transform.position += _velocity * Time.deltaTime;
+            TryJump();
+        }
 
+        //rigidbody.MovePosition(transform.position);
+        
         animator.SetFloat("xDir", _moveDirX);
         animator.SetFloat("yDir", _moveDirZ);
-
-        TryJump();
     }
 
     private void TryRun()
@@ -100,7 +106,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void CheckGround()
     {
-        isGround = Physics.Raycast(transform.position, Vector3.down, capsuleCollider.bounds.extents.y - 0.1f);
+        //Debug.DrawRay(this.transform.position + Vector3.up, Vector3.forward * 5, Color.red);
+
+        isGround = Physics.Raycast(this.transform.position, Vector3.down, capsuleCollider.bounds.extents.y - 0.1f);
         animator.SetBool("isJump", false);
+    }
+
+    private void StopToWall()
+    {
+        Debug.DrawRay(this.transform.position, transform.forward * 5, Color.green);
+        isBorder = Physics.Raycast(transform.position, transform.forward, 5, LayerMask.GetMask("Wall"));
     }
 }
