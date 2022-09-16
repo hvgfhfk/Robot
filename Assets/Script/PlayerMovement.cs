@@ -15,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
 
     public float jumpForce = 5.0f;
 
+    private float mouseX = 0;
+
     [SerializeField]
     private float applySpeed;
 
@@ -52,14 +54,18 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * applySpeed;
 
-        if(!isBorder)
+        if (!isBorder)
         {
             transform.position += _velocity * Time.deltaTime;
             TryJump();
         }
 
+        mouseX += Input.GetAxis("Mouse X") * 10;
+        transform.eulerAngles = new Vector3(0, mouseX, 0);
+
+
         //rigidbody.MovePosition(transform.position);
-        
+
         animator.SetFloat("xDir", _moveDirX);
         animator.SetFloat("yDir", _moveDirZ);
     }
